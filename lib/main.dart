@@ -1,10 +1,13 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'constants/app_theme.dart';
 import 'views/login_view.dart';
 import 'views/signup_view.dart';
 import 'views/forgot_password_view.dart';
-import 'views/home_view.dart';
+import 'views/EmployeeDashboardScreen.dart';
+import 'controllers/employee_dashboard_controller.dart';
+import 'controllers/check_in_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,71 +18,27 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Firebase Auth App',
+    return GetMaterialApp(
+      title: 'Employee Management',
+      theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Color(0xFF1976D2),
-        colorScheme: ColorScheme.light(
-          primary: Color(0xFF1976D2),
-          secondary: Color(0xFF2196F3),
-          surface: Colors.white,
-          background: Color(0xFF1976D2),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFF1976D2)),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF1976D2),
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 2,
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          ),
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xFF1976D2),
-          elevation: 0,
-          centerTitle: true,
-          iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       initialRoute: '/login',
-      routes: {
-        '/login': (_) => LoginView(),
-        '/signup': (_) => SignupView(),
-        '/forgot': (_) => ForgotPasswordView(),
-        '/home': (_) => HomeView(),
-      },
+      initialBinding: BindingsBuilder(() {
+        Get.put(CheckInController());
+      }),
+      getPages: [
+        GetPage(name: '/login', page: () => LoginView()),
+        GetPage(name: '/signup', page: () => SignupView()),
+        GetPage(name: '/forgot-password', page: () => ForgotPasswordView()),
+        GetPage(
+          name: '/dashboard',
+          page: () => const EmployeeDashboardScreen(),
+          binding: BindingsBuilder(() {
+            Get.lazyPut<EmployeeDashboardController>(() => EmployeeDashboardController());
+          }),
+          transition: Transition.fadeIn,
+        ),
+      ],
     );
   }
 }
